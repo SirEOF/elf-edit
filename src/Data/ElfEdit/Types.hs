@@ -806,11 +806,11 @@ elfFileData = lens _elfFileData (\s v -> s { _elfFileData = v })
 -- | Adding support for parsing ELF notes. ElfNotes don't have
 -- dependency on World size, so the datatype definition is not
 -- parameterized by word size.
-data ElfNote = ElfNote
+data ElfNote w = ElfNote
   {
-    noteSize      :: !Word32
-  , noteDescSize  :: !Word32
-  , noteType      :: !Word32
+    noteSize      :: !w
+  , noteDescSize  :: !w
+  , noteType      :: !w
   , noteName      :: !B.ByteString
   , noteDesc      :: !B.ByteString
-  } deriving(Show)
+  }deriving(Show)
