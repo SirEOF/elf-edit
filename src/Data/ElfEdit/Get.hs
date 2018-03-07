@@ -1004,20 +1004,27 @@ singleNoteParser32 cls = do
 
 singleNoteParser64 :: ElfData -> Get.Get (ElfNote (ElfWordType 64))
 singleNoteParser64 cls = do
-  nsz <- getWord64 cls
-  dsz <- getWord64 cls
-  typ <- getWord64 cls
-  -- Alignment is always on 4-byte boundary
-  -- even on 64-bit platforms
+  nsz <- getWord32 cls
+  dsz <- getWord32 cls
+  typ <- getWord32 cls
+
   let padded_nsz = 4 * ((nsz + 3) `div` 4)
   let padded_dsz = 4 * ((dsz + 3) `div` 4)
-  padded_name <- Get.getByteString (fromIntegral padded_nsz)
+  let delta      = padded_nsz - nsz
+  padded_name <- Get.getByteString (fromIntegral nsz)
+
+  unless (padded_name == "sgx_metadata\0") $
+    Get.skip (fromIntegral delta)
+
   padded_desc <- Get.getByteString (fromIntegral padded_dsz)
+  when (padded_name == "sgx_metadata\0") $
+    Get.skip (fromIntegral delta)
+
   return $! ElfNote
     {
-      noteSize     = nsz
-    , noteDescSize = dsz
-    , noteType     = typ
+      noteSize     = fromIntegral nsz
+    , noteDescSize = fromIntegral dsz
+    , noteType     = fromIntegral typ
     , noteName     = B.take (fromIntegral nsz) padded_name
     , noteDesc     = B.take (fromIntegral dsz) padded_desc
     }
