@@ -122,7 +122,7 @@ module Data.ElfEdit
   , pattern PT_LOPROC
   , pattern PT_HIPROC
     -- ** Elf segment flags
-  , ElfSegmentFlags
+  , ElfSegmentFlags(..)
   , pf_none, pf_x, pf_w, pf_r
     -- ** ElfMemSize
   , ElfMemSize(..)
